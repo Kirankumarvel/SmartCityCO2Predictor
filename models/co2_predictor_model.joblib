@@ -1,0 +1,28 @@
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from joblib import dump
+
+# Load dataset
+data_path = "data/city_co2_emissions.csv"
+df = pd.read_csv(data_path)
+
+# Ensure dataset has enough valid data
+df = df.dropna(subset=['CO2Emissions'])
+if len(df) < 2:
+    raise ValueError("Not enough data to train the model.")
+
+# Prepare training data
+X = df[['TrafficScore', 'ReviewCount']]
+y = df['CO2Emissions']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Save trained model
+dump(model, "models/co2_predictor_model.joblib")
+print("Model trained and saved successfully.")
